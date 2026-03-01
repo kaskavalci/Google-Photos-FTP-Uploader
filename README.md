@@ -1,8 +1,39 @@
 # Google Photos FTP Uploader
 
+![](./docs/logo.png)
+
 Manage photos from a **Sony A7** (or other FTP-capable camera): camera → FTP → server → Google Photos, with optional NFS backup. Deploy via git and environment variables; no manual config editing beyond a one-time Google Photos auth step.
 
 **Audience:** Newcomers who want to set this up on a headless server (e.g. Raspberry Pi) and configure everything with env vars.
+
+```mermaid
+flowchart LR
+  subgraph camera [Camera]
+    A7[Sony A7]
+  end
+  subgraph server [Server]
+    FTP[SFTPGo FTP :2121]
+    Inbox[(photo_inbox)]
+    Watcher[watcher.sh]
+    Organized[(photo_organized / date)]
+    CLI[gphotos-uploader-cli]
+    NFS[(NFS backup)]
+  end
+  subgraph cloud [Cloud]
+    GPhotos[Google Photos]
+  end
+  subgraph optional [Optional]
+    HA[Home Assistant notify]
+  end
+  A7 -->|FTP upload| FTP
+  FTP --> Inbox
+  Inbox -->|poll, stable check| Watcher
+  Watcher -->|exiftool by date| Organized
+  Organized --> CLI
+  CLI -->|push| GPhotos
+  Watcher -->|rsync if .mounted| NFS
+  Watcher -.->|on failure| HA
+```
 
 ---
 
