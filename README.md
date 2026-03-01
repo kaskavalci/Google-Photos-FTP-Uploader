@@ -92,7 +92,7 @@ By default the stack uses the processor image built by CI and published to [GitH
 
 To build and use a local image instead, set `PROCESSOR_IMAGE=local-photo-processor:latest` and run `docker build -t local-photo-processor:latest .` from the repo root before deploying.
 
-Deploy the stack (e.g. in Portainer: Stacks → Add stack → paste contents of `stack.yaml` → add the environment variables from the example file → Deploy).
+Deploy the stack (e.g. in Portainer: Stacks → Add stack → paste contents of `docker-compose.yaml` → add the environment variables from the example file → Deploy).
 
 ### CI
 
