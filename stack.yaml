@@ -1,0 +1,51 @@
+# Host paths below must exist before deploying. Run once:
+#   sudo mkdir -p /mnt/ssd/nfs/docker_data/{sftpgo_config,photo_inbox,photo_organized,processor_config} /mnt/nas/photos
+#   sudo chown -R 1000:1000 /mnt/ssd/nfs/docker_data
+# Optional: set DOCKER_DATA_PATH in env to override the default /mnt/ssd/nfs/docker_data.
+# Then deploy this stack from Portainer (Stacks -> Add stack).
+#
+# Processor uses a custom image (watcher + exiftool + gphotos-uploader-cli) for headless use.
+# Maintainer POC for local/interactive Docker use: see gphotos-uploader-docker/README.md.
+
+version: "3.8"
+
+services:
+  sftpgo:
+    image: drakkan/sftpgo:v2-alpine
+    container_name: photo-sftpgo
+    restart: unless-stopped
+    network_mode: host
+    # Port 2121 (non-privileged) so we can run as 1000 and avoid root for port 21
+    user: "1000:1000"
+    environment:
+      - SFTPGO_DATAPROVIDER__NAME=/var/lib/sftpgo/sftpgo.db
+      - SFTPGO_FTPD__BINDINGS__0__PORT=2121
+      - SFTPGO_FTPD__BINDINGS__0__ADDRESS=0.0.0.0
+      - SFTPGO_FTPD__BINDINGS__0__TLS_MODE=0
+      - SFTPGO_FTPD__PASSIVE_PORT_RANGE__START=50000
+      - SFTPGO_FTPD__PASSIVE_PORT_RANGE__END=50100
+      - SFTPGO_FTPD__BINDINGS__0__FORCE_PASSIVE_IP=${SERVER_LAN_IP}
+      - SFTPGO_FTPD__BINDINGS__0__PASSIVE_CONNECTIONS_SECURITY=0
+      - SFTPGO_SFTPD__BINDINGS__0__PORT=0
+      - SFTPGO_WEBDAVD__BINDINGS__0__PORT=0
+    volumes:
+      - ${DOCKER_DATA_PATH:-/mnt/ssd/nfs/docker_data}/sftpgo_config:/var/lib/sftpgo
+      - ${DOCKER_DATA_PATH:-/mnt/ssd/nfs/docker_data}/photo_inbox:/srv/sftpgo/data
+
+  processor:
+    # Default: pull from GHCR (CI). Override PROCESSOR_IMAGE to use a local or other image (see README).
+    image: ${PROCESSOR_IMAGE:-ghcr.io/kaskavalci/google-photos-ftp-uploader:latest}
+    container_name: photo-processor
+    restart: unless-stopped
+    environment:
+      - GPHOTOS_CLI_TOKENSTORE_KEY=${GPHOTOS_CLI_TOKENSTORE_KEY}
+      - TZ=${TZ:-UTC}
+      # Optional: Home Assistant webhook URL to notify on fatal failure (see README)
+      - NOTIFY_WEBHOOK_URL=${NOTIFY_WEBHOOK_URL:-}
+    volumes:
+      - ${DOCKER_DATA_PATH:-/mnt/ssd/nfs/docker_data}/photo_inbox:/data/inbox
+      - ${DOCKER_DATA_PATH:-/mnt/ssd/nfs/docker_data}/photo_organized:/data/photos
+      - ${DOCKER_DATA_PATH:-/mnt/ssd/nfs/docker_data}/processor_config:/config
+      - ${NFS_PHOTOS_PATH:-/mnt/nas/photos}:/data/nfs
+    depends_on:
+      - sftpgo

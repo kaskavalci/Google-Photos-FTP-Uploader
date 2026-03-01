@@ -1,0 +1,12 @@
+# macOS resource forks on non-HFS (e.g. NFS) — do not commit
+._*
+
+# Do not commit real credentials or local env
+.env
+portainer.env
+
+# Only the template is in the repo; real config lives in processor_config on the server
+config.hjson
+
+# Legacy scripts may contain real credentials
+legacy/

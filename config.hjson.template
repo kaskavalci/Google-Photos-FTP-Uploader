@@ -1,0 +1,21 @@
+# gphotos-uploader-cli config — structure matches current CLI docs (config.hjson).
+# Account must match the token subdir name under config dir (e.g. tokens/comexx@gmail.com).
+{
+  APIAppCredentials:
+  {
+    ClientID: CLIENT_ID
+    ClientSecret: YOUR_CLIENT_SECRET
+  }
+  Account: YOUR_EMAIL_ADDRESS
+  SecretsBackendType: file
+  Jobs:
+  [
+    {
+      SourceFolder: /data/photos
+      Album: "template:%_directory%"
+      DeleteAfterUpload: false
+      IncludePatterns: [ "_IMAGE_EXTENSIONS_", "_RAW_EXTENSIONS_" ]
+      ExcludePatterns: []
+    }
+  ]
+}
