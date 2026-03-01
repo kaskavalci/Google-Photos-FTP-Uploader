@@ -135,7 +135,7 @@ The workflow in `.github/workflows/build-processor.yml` builds the processor ima
 
 After the first deploy:
 
-1. Open `http://<SERVER_IP>:8080` and create the admin account.
+1. Open `http://<SERVER_IP>:8082` and create the admin account.
 2. Go to Users → Add. Set **Username** (e.g. `camera`) and **Password**.
 3. The user’s home directory will map to `…/photo_inbox/<username>` under your `DOCKER_DATA_PATH`.
 

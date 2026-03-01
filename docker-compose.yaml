@@ -27,6 +27,8 @@ services:
       - SFTPGO_FTPD__BINDINGS__0__FORCE_PASSIVE_IP=${SERVER_LAN_IP}
       - SFTPGO_FTPD__BINDINGS__0__PASSIVE_CONNECTIONS_SECURITY=0
       - SFTPGO_SFTPD__BINDINGS__0__PORT=0
+      - SFTPGO_HTTPD__BINDINGS__0__PORT=8082
+      - SFTPGO_HTTPD__BINDINGS__0__ADDRESS=0.0.0.0
       - SFTPGO_WEBDAVD__BINDINGS__0__PORT=0
     volumes:
       - ${DOCKER_DATA_PATH:-/mnt/ssd/nfs/docker_data}/sftpgo_config:/var/lib/sftpgo
