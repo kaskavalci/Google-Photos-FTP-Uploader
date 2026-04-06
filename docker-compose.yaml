@@ -11,7 +11,7 @@ version: "3.8"
 
 services:
   sftpgo:
-    image: drakkan/sftpgo:v2-alpine
+    image: drakkan/sftpgo:v2
     container_name: photo-sftpgo
     restart: unless-stopped
     network_mode: host

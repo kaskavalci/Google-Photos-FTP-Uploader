@@ -1,0 +1,23 @@
+diff --git a/docker-compose.yaml b/docker-compose.yaml
+index dab6cf2..47d5152 100644
+--- a/docker-compose.yaml
++++ b/docker-compose.yaml
+@@ -11,7 +11,8 @@ version: "3.8"
+
+ services:
+   sftpgo:
+-    image: drakkan/sftpgo:v2-alpine
++    # v2-alpine arm64 manifest ships a 0-byte sftpgo binary (exec format error). Use v2 (debian) until upstream fixes.
++    image: drakkan/sftpgo:v2
+     container_name: photo-sftpgo
+     restart: unless-stopped
+     network_mode: host
+@@ -28,6 +29,8 @@ services:
+       - SFTPGO_FTPD__BINDINGS__0__PASSIVE_CONNECTIONS_SECURITY=0
+       - SFTPGO_SFTPD__BINDINGS__0__PORT=0
+       - SFTPGO_WEBDAVD__BINDINGS__0__PORT=0
++      # host network: default HTTP :8080 conflicts with other services (e.g. haven); FTP-only stack
++      - SFTPGO_HTTPD__BINDINGS__0__PORT=0
+     volumes:
+       - ${DOCKER_DATA_PATH:-/mnt/ssd/nfs/docker_data}/sftpgo_config:/var/lib/sftpgo
+       - ${DOCKER_DATA_PATH:-/mnt/ssd/nfs/docker_data}/photo_inbox:/srv/sftpgo/data
